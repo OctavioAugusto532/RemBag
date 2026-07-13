@@ -1,67 +1,57 @@
 const itens = ["Notebook 💻", "Carregador 🔌", "Chaves 🔑", "Carteira 👛", "Celular 📱", "Garrafa 🥤", "Caderno 📒"];
-const frases = ["Organização economiza tempo.", "Você está preparado para o dia.", "Conferir a mochila evita imprevistos.", "Pequenos hábitos fazem grande diferença."];
-let historico = [];
+const frases = ["Você está pronto para vencer!", "Organização é a chave do sucesso.", "Mochila pronta, mente tranquila."];
 
 const container = document.getElementById('checklist');
-const resultDiv = document.getElementById('result');
 const progressBar = document.getElementById('progress-bar');
 const statsText = document.getElementById('stats-text');
-const historyList = document.getElementById('history-list');
+const resultBox = document.getElementById('result-box');
+const resultContent = document.getElementById('result-content');
 
-// Inicializa Checklist
+// Renderização inicial
 itens.forEach((item, index) => {
-    container.innerHTML += `
+    container.insertAdjacentHTML('beforeend', `
         <div class="item">
-            <input type="checkbox" id="item-${index}" onchange="atualizar()">
-            <label for="item-${index}">${item}</label>
+            <input type="checkbox" id="item-${index}" onchange="updateUI()">
+            <label for="item-${index}" style="margin-left:10px; cursor:pointer;">${item}</label>
         </div>
-    `;
+    `);
 });
 
-function atualizar() {
-    const checks = document.querySelectorAll('input:checked');
+function updateUI() {
+    const checked = document.querySelectorAll('input:checked').length;
     const total = itens.length;
-    const marcados = checks.length;
-    const porcentagem = (marcados / total) * 100;
+    const percent = Math.round((checked / total) * 100);
     
-    progressBar.style.width = porcentagem + "%";
-    statsText.innerText = `Itens: ${marcados} / ${total} | Faltando: ${total - marcados}`;
+    progressBar.style.width = `${percent}%`;
+    statsText.innerText = `${percent}% concluído (${checked}/${total})`;
 }
 
-function salvarHistorico(msg) {
-    const agora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    historico.unshift(`${agora} - ${msg}`);
-    if (historico.length > 5) historico.pop();
-    
-    historyList.innerHTML = historico.map(h => `<li>${h}</li>`).join('');
+function showResult(message, isSuccess) {
+    resultBox.className = `result-box ${isSuccess ? 'bg-success' : 'bg-danger'}`;
+    resultBox.style.background = isSuccess ? '#dcfce7' : '#fee2e2';
+    resultContent.innerHTML = message;
+    resultBox.classList.remove('hidden');
 }
 
 document.getElementById('btn-check').addEventListener('click', () => {
-    const naoMarcados = Array.from(document.querySelectorAll('input:not(:checked)'))
-        .map(el => el.nextElementSibling.innerText);
+    const missing = Array.from(document.querySelectorAll('input:not(:checked)'))
+        .map(i => i.nextElementSibling.innerText);
 
-    resultDiv.style.display = "block";
-    if (naoMarcados.length === 0) {
-        resultDiv.style.background = "#dcfce7";
-        resultDiv.innerHTML = `✅ Tudo certo! ${frases[Math.floor(Math.random()*frases.length)]}`;
-        salvarHistorico("Tudo OK");
+    if (missing.length === 0) {
+        showResult(`✅ Tudo pronto! ${frases[Math.floor(Math.random()*frases.length)]}`, true);
     } else {
-        resultDiv.style.background = "#fee2e2";
-        resultDiv.innerHTML = `⚠ Faltando: ${naoMarcados.join(', ')}`;
-        salvarHistorico(`Faltando: ${naoMarcados.length} itens`);
+        showResult(`⚠ Faltando: <b>${missing.join(', ')}</b>`, false);
     }
 });
 
 document.getElementById('btn-sensor').addEventListener('click', () => {
-    resultDiv.style.display = "block";
-    resultDiv.innerHTML = "📡 Escaneando mochila...";
-    setTimeout(() => {
-        document.getElementById('btn-check').click();
-    }, 2000);
+    resultContent.innerHTML = "🔍 Escaneando componentes...";
+    resultBox.classList.remove('hidden');
+    setTimeout(() => document.getElementById('btn-check').click(), 1500);
 });
 
 document.getElementById('btn-clear').addEventListener('click', () => {
     document.querySelectorAll('input').forEach(i => i.checked = false);
-    resultDiv.style.display = "none";
-    atualizar();
+    resultBox.classList.add('hidden');
+    updateUI();
 });
