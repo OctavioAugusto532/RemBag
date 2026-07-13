@@ -3,40 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartBag | Mochila Inteligente</title>
+    <title>SmartBag | Protótipo</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="app-container">
-        <header class="app-header">
-            <h1>Mochila Anti-Esquecimento</h1>
-            <p>Seu assistente pessoal de organização.</p>
+    <div class="app-container">
+        <header>
+            <h1>SmartBag</h1>
+            <p>Sua mochila, agora inteligente.</p>
         </header>
 
-        <section class="stats-dashboard">
-            <div class="progress-wrapper">
-                <div id="progress-bar" class="progress-fill"></div>
-            </div>
-            <div id="stats-text" class="stats-counter">0% concluído</div>
+        <section class="stats-panel">
+            <div class="progress-bar-bg"><div id="progress-bar"></div></div>
+            <p id="stats-text">Itens: 0/7 | Faltando: 7</p>
         </section>
 
-        <section class="checklist" id="checklist"></section>
+        <div id="checklist" class="checklist-grid"></div>
 
         <div class="actions">
-            <button id="btn-check" class="btn-main">Verificar Mochila</button>
+            <button id="btn-check" class="btn-primary">Verificar Mochila</button>
             <button id="btn-sensor" class="btn-secondary">Simular Sensor</button>
-            <button id="btn-clear" class="btn-ghost">Limpar Tudo</button>
+            <button id="btn-clear" class="btn-ghost">Limpar</button>
         </div>
 
-        <div id="result-box" class="result-box hidden">
-            <div id="result-content"></div>
+        <div id="result-alert" class="alert hidden">
+            <span id="alert-icon"></span>
+            <p id="alert-message"></p>
         </div>
 
         <section class="history-section">
-            <h3>Últimos Registros</h3>
+            <h3>Histórico de Verificações</h3>
             <ul id="history-list"></ul>
         </section>
-    </main>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
