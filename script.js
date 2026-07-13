@@ -1,57 +1,65 @@
-const itens = ["Notebook 💻", "Carregador 🔌", "Chaves 🔑", "Carteira 👛", "Celular 📱", "Garrafa 🥤", "Caderno 📒"];
-const frases = ["Você está pronto para vencer!", "Organização é a chave do sucesso.", "Mochila pronta, mente tranquila."];
+const essentials = [
+    { name: "Notebook", icon: "💻" }, { name: "Carregador", icon: "🔌" },
+    { name: "Chaves", icon: "🔑" }, { name: "Carteira", icon: "👛" },
+    { name: "Celular", icon: "📱" }, { name: "Garrafa", icon: "🥤" },
+    { name: "Caderno", icon: "📒" }
+];
 
-const container = document.getElementById('checklist');
+const checklist = document.getElementById('checklist');
 const progressBar = document.getElementById('progress-bar');
 const statsText = document.getElementById('stats-text');
-const resultBox = document.getElementById('result-box');
-const resultContent = document.getElementById('result-content');
+const alertBox = document.getElementById('result-alert');
+const alertMsg = document.getElementById('alert-message');
+const historyList = document.getElementById('history-list');
 
-// Renderização inicial
-itens.forEach((item, index) => {
-    container.insertAdjacentHTML('beforeend', `
-        <div class="item">
-            <input type="checkbox" id="item-${index}" onchange="updateUI()">
-            <label for="item-${index}" style="margin-left:10px; cursor:pointer;">${item}</label>
+// Inicialização
+essentials.forEach((item, index) => {
+    checklist.innerHTML += `
+        <div class="item-card" onclick="toggleItem(${index})">
+            <input type="checkbox" id="check-${index}" style="display:none">
+            <span>${item.icon} ${item.name}</span>
         </div>
-    `);
+    `;
 });
 
-function updateUI() {
-    const checked = document.querySelectorAll('input:checked').length;
-    const total = itens.length;
-    const percent = Math.round((checked / total) * 100);
-    
-    progressBar.style.width = `${percent}%`;
-    statsText.innerText = `${percent}% concluído (${checked}/${total})`;
+function toggleItem(index) {
+    const el = document.querySelectorAll('.item-card')[index];
+    const checkbox = document.getElementById(`check-${index}`);
+    checkbox.checked = !checkbox.checked;
+    el.classList.toggle('checked');
+    updateStats();
 }
 
-function showResult(message, isSuccess) {
-    resultBox.className = `result-box ${isSuccess ? 'bg-success' : 'bg-danger'}`;
-    resultBox.style.background = isSuccess ? '#dcfce7' : '#fee2e2';
-    resultContent.innerHTML = message;
-    resultBox.classList.remove('hidden');
+function updateStats() {
+    const total = essentials.length;
+    const checked = document.querySelectorAll('input:checked').length;
+    const percent = (checked / total) * 100;
+    progressBar.style.width = `${percent}%`;
+    statsText.innerText = `Itens: ${checked}/${total} | Faltando: ${total - checked}`;
 }
 
 document.getElementById('btn-check').addEventListener('click', () => {
-    const missing = Array.from(document.querySelectorAll('input:not(:checked)'))
-        .map(i => i.nextElementSibling.innerText);
-
+    const missing = essentials.filter((_, i) => !document.getElementById(`check-${i}`).checked);
+    alertBox.classList.remove('hidden');
+    
     if (missing.length === 0) {
-        showResult(`✅ Tudo pronto! ${frases[Math.floor(Math.random()*frases.length)]}`, true);
+        alertBox.style.background = "#dcfce7";
+        alertMsg.innerHTML = "✅ Tudo pronto! Você está preparado.";
+        saveHistory("Tudo OK");
     } else {
-        showResult(`⚠ Faltando: <b>${missing.join(', ')}</b>`, false);
+        alertBox.style.background = "#fee2e2";
+        alertMsg.innerHTML = `⚠ Faltando: ${missing.map(m => m.name).join(', ')}`;
+        saveHistory(`Faltando: ${missing.length} itens`);
     }
 });
 
 document.getElementById('btn-sensor').addEventListener('click', () => {
-    resultContent.innerHTML = "🔍 Escaneando componentes...";
-    resultBox.classList.remove('hidden');
-    setTimeout(() => document.getElementById('btn-check').click(), 1500);
+    alertBox.classList.remove('hidden');
+    alertMsg.innerHTML = "📡 Escaneando tags RFID...";
+    setTimeout(() => document.getElementById('btn-check').click(), 2000);
 });
 
-document.getElementById('btn-clear').addEventListener('click', () => {
-    document.querySelectorAll('input').forEach(i => i.checked = false);
-    resultBox.classList.add('hidden');
-    updateUI();
-});
+function saveHistory(status) {
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    historyList.innerHTML = `<li>${time} - ${status}</li>` + historyList.innerHTML;
+}
