@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mochila Anti-Esquecimento</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Mochila Anti-Esquecimento</h1>
+            <p>Confira se você está levando tudo antes de sair.</p>
+        </header>
+
+        <section class="stats">
+            <div class="progress-container">
+                <div id="progress-bar" style="width: 0%;"></div>
+            </div>
+            <p id="stats-text">Itens: 0 / 7 | Faltando: 7</p>
+        </section>
+
+        <section class="checklist" id="checklist">
+            </section>
+
+        <div class="actions">
+            <button id="btn-check">Verificar Mochila</button>
+            <button id="btn-sensor" class="secondary">Simular Sensor</button>
+            <button id="btn-clear" class="danger">Limpar</button>
+        </div>
+
+        <div id="result" class="result"></div>
+
+        <section class="history">
+            <h3>Histórico Recente</h3>
+            <ul id="history-list"></ul>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
