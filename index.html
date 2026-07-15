@@ -3,39 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartBag | Protótipo</title>
-    <link rel="stylesheet" href="style.css">
+    <title>RemBag - Mochila Inteligente</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h1 { color: #333; text-align: center; }
+        .input-group { display: flex; gap: 5px; margin-bottom: 20px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #007bff; color: white; }
+        .item-list { list-style: none; padding: 0; }
+        .item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .alert { background: #ffcccc; color: #d8000c; padding: 15px; margin-top: 20px; border-radius: 5px; display: none; text-align: center; font-weight: bold; border: 2px solid #d8000c; }
+        .scan-btn { width: 100%; margin-top: 20px; background: #28a745; font-size: 1.2em; padding: 15px; }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <header>
-            <h1>SmartBag</h1>
-            <p>Sua mochila, agora inteligente.</p>
-        </header>
 
-        <section class="stats-panel">
-            <div class="progress-bar-bg"><div id="progress-bar"></div></div>
-            <p id="stats-text">Itens: 0/7 | Faltando: 7</p>
-        </section>
-
-        <div id="checklist" class="checklist-grid"></div>
-
-        <div class="actions">
-            <button id="btn-check" class="btn-primary">Verificar Mochila</button>
-            <button id="btn-sensor" class="btn-secondary">Simular Sensor</button>
-            <button id="btn-clear" class="btn-ghost">Limpar</button>
-        </div>
-
-        <div id="result-alert" class="alert hidden">
-            <span id="alert-icon"></span>
-            <p id="alert-message"></p>
-        </div>
-
-        <section class="history-section">
-            <h3>Histórico de Verificações</h3>
-            <ul id="history-list"></ul>
-        </section>
+<div class="container">
+    <h1>RemBag</h1>
+    
+    <div class="input-group">
+        <input type="text" id="itemInput" placeholder="Adicionar objeto...">
+        <button onclick="addItem()">+</button>
     </div>
-    <script src="script.js"></script>
+
+    <ul id="itemList" class="item-list"></ul>
+
+    <button class="scan-btn" onclick="scanBag()">Escanear Mochila</button>
+
+    <div id="alertBox" class="alert"></div>
+</div>
+
+<script>
+    let inventory = [];
+
+    function addItem() {
+        const input = document.getElementById('itemInput');
+        if (input.value === "") return;
+        
+        const item = { name: input.value, checked: false };
+        inventory.push(item);
+        input.value = "";
+        renderItems();
+    }
+
+    function toggleItem(index) {
+        inventory[index].checked = !inventory[index].checked;
+    }
+
+    function renderItems() {
+        const list = document.getElementById('itemList');
+        list.innerHTML = "";
+        inventory.forEach((item, index) => {
+            list.innerHTML += `
+                <li class="item">
+                    ${item.name}
+                    <input type="checkbox" onchange="toggleItem(${index})">
+                </li>`;
+        });
+    }
+
+    function scanBag() {
+        const alertBox = document.getElementById('alertBox');
+        const missing = inventory.filter(item => !item.checked);
+
+        if (missing.length > 0) {
+            // Aviso Visual
+            alertBox.style.display = "block";
+            alertBox.innerText = "ALERTA: Faltando itens: " + missing.map(i => i.name).join(", ");
+            
+            // Aviso Sonoro (Beep simples)
+            const audio = new AudioContext();
+            const osc = audio.createOscillator();
+            osc.connect(audio.destination);
+            osc.start();
+            osc.stop(audio.currentTime + 0.5);
+        } else {
+            alertBox.style.display = "none";
+            alert("Tudo certo! Mochila completa.");
+        }
+    }
+</script>
+
 </body>
 </html>
